@@ -1,8 +1,13 @@
 const { Template } = require('ejs');
+const {generateRandomString} = require('./generate_string/generateRandomString')
 const express = require('express');
 const app = express();
 const PORT = 8080;
 
+/********************************************************
+ * GENERATE LETTERS
+ *******************************************************/
+const generateString =  generateRandomString();
 /********************************************************
  * SETTERS
  *******************************************************/
