@@ -3,32 +3,50 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 
+/********************************************************
+ * SETTERS
+ *******************************************************/
+
 app.set("view engine","ejs")
+
+/********************************************************
+ * Parse buffer for app
+ *******************************************************/
+
+app.use(express.urlencoded({ extended: true }));
+
+/********************************************************
+ * Database
+ *******************************************************/
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 }
 
+/********************************************************
+ * GETTERS
+ *******************************************************/
+
 app.get("/", (request,response) => {
   response.send('Hello')
 });
 
-// app.get("/urls", (req,res) => {
-//   templateVars = {urls:urlDatabase}
-//   res.render("urls_index",templateVars)
-// })
-
-app.get("/u/new", (req,res) => {
+app.get("/urls", (req,res) => {
   templateVars = {urls:urlDatabase}
-  res.render("u_new_index",templateVars)
+  res.render("urls_index",templateVars)
 })
+
+app.get("/urls/new", (req, res) => {
+  console.log(req.params)
+  res.render("urls_new");
+});
 
 app.get("/urls/:id", (req, res) => {
   const shortUrl = req.params.id;
   //console.log(req.params)
   const templateVars = { id: shortUrl, longURL: urlDatabase[shortUrl] /* What goes here? */ };
-  //console.log(templateVars)
+  console.log(templateVars)
   res.render("urls_show", templateVars);
 });
 
@@ -49,6 +67,17 @@ app.get("/set", (req, res) => {
   res.send(`a = ${a}`);
  });
 
+/********************************************************
+ * POST
+ *******************************************************/
+ app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
+/********************************************************
+ * LISTEN
+ *******************************************************/
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`)
 });
