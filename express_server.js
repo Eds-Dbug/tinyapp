@@ -14,10 +14,23 @@ app.get("/", (request,response) => {
   response.send('Hello')
 });
 
-app.get("/urls", (req,res) => {
+// app.get("/urls", (req,res) => {
+//   templateVars = {urls:urlDatabase}
+//   res.render("urls_index",templateVars)
+// })
+
+app.get("/u/new", (req,res) => {
   templateVars = {urls:urlDatabase}
-  res.render("urls_index",templateVars)
+  res.render("u_new_index",templateVars)
 })
+
+app.get("/urls/:id", (req, res) => {
+  const shortUrl = req.params.id;
+  //console.log(req.params)
+  const templateVars = { id: shortUrl, longURL: urlDatabase[shortUrl] /* What goes here? */ };
+  //console.log(templateVars)
+  res.render("urls_show", templateVars);
+});
 
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
