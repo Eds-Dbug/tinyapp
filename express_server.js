@@ -1,3 +1,4 @@
+const { Template } = require('ejs');
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -12,6 +13,11 @@ const urlDatabase = {
 app.get("/", (request,response) => {
   response.send('Hello')
 });
+
+app.get("/urls", (req,res) => {
+  templateVars = {urls:urlDatabase}
+  res.render("urls_index",templateVars)
+})
 
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
