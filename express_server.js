@@ -54,13 +54,24 @@ app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
 
+/********************************************************************************
+ * POST ROUTES
+ ******************************************************************************/
+
 app.post('/urls', (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const longURL = req.body.longURL
   const genId = generateRandomString();
   urlDatabase[genId] = longURL;
   res.redirect(`/urls/${genId}`);
 });
+
+app.post('/urls/:id/delete', (req,res)=> {
+  //console.log(req.params.id)
+  console.log(req.params)
+  delete urlDatabase[req.params.id]
+  res.redirect('/urls')
+}) 
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
