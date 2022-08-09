@@ -1,88 +1,67 @@
-const { Template } = require('ejs');
-const {generateRandomString} = require('./generate_string/generateRandomString')
 const express = require('express');
+const {generateRandomString} = require('./generate_string/generateRandomString')
 const app = express();
 const PORT = 8080;
 
-/********************************************************
- * GENERATE LETTERS
- *******************************************************/
-const generateString =  generateRandomString();
-/********************************************************
- * SETTERS
- *******************************************************/
 
-app.set("view engine","ejs")
+app.set('view engine', 'ejs');
 
-/********************************************************
- * Parse buffer for app
- *******************************************************/
 
-app.use(express.urlencoded({ extended: true }));
-
-/********************************************************
- * Database
- *******************************************************/
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
-}
+};
 
-/********************************************************
- * GETTERS
- *******************************************************/
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (request,response) => {
-  response.send('Hello')
+
+app.get('/',(req, res) => {
+  res.send('Hello World!');
 });
 
-app.get("/urls", (req,res) => {
-  templateVars = {urls:urlDatabase}
-  res.render("urls_index",templateVars)
-})
-
-app.get("/urls/new", (req, res) => {
-  console.log(req.params)
-  res.render("urls_new");
+app.get('/urls',(req, res) => {
+  const templateVars = {urls: urlDatabase};
+  res.render('urls_index', templateVars);
 });
 
-app.get("/urls/:id", (req, res) => {
-  const shortUrl = req.params.id;
-  //console.log(req.params)
-  const templateVars = { id: shortUrl, longURL: urlDatabase[shortUrl] /* What goes here? */ };
-  console.log(templateVars)
-  res.render("urls_show", templateVars);
+
+
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id
+  if(urlDatabase[shortURL]){
+    res.redirect(urlDatabase[shortURL]);
+  }
+  res.status(400).send("No link here");
+  
 });
 
-app.get("/urls.json", (req,res) => {
+
+app.get('/urls/new',(req, res) => {
+  res.render('urls_new');
+});
+
+app.get('/urls/:id',(req, res) => {
+const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
+  res.render('urls_show', templateVars);
+});
+
+app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
-})
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
- });
- 
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
-
-/********************************************************
- * POST
- *******************************************************/
- app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+app.get('/hello', (req, res) => {
+  res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
 
-/********************************************************
- * LISTEN
- *******************************************************/
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  const longURL = req.body.longURL
+  const genId = generateRandomString();
+  urlDatabase[genId] = longURL;
+  res.redirect(`/urls/${genId}`);
+});
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`)
+  console.log(`App listening on port ${PORT}`);
 });
