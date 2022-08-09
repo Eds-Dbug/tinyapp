@@ -25,8 +25,6 @@ app.get('/urls',(req, res) => {
   res.render('urls_index', templateVars);
 });
 
-
-
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id
   if(urlDatabase[shortURL]){
@@ -36,13 +34,16 @@ app.get("/u/:id", (req, res) => {
   
 });
 
-
 app.get('/urls/new',(req, res) => {
   res.render('urls_new');
 });
 
 app.get('/urls/:id',(req, res) => {
-const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
+  //console.log(req.params)
+const templateVars = {
+  id: req.params.id, 
+  longURL: urlDatabase[req.params.id]
+};
   res.render('urls_show', templateVars);
 });
 
@@ -65,6 +66,16 @@ app.post('/urls', (req, res) => {
   urlDatabase[genId] = longURL;
   res.redirect(`/urls/${genId}`);
 });
+
+/**for update */
+app.post('/urls/:id', (req, res) => {
+  console.log(req.body)
+  const longURL = req.body.longURL
+  const id = req.params.id;
+  urlDatabase[id] = longURL;
+  res.redirect(`/urls/${id}`);
+
+})
 
 app.post('/urls/:id/delete', (req,res)=> {
   //console.log(req.params.id)
