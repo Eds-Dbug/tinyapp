@@ -19,10 +19,10 @@
       </div>
     </div>
 
-    <% if(username){ %>
+    <% if(user){ %>
       <form method="POST" action="/logout">
         <div class="d-flex justify-content-between align-items-center ">
-          <h5 class="m-md">Logged in as: <%= username %> </h5>
+          <h5 class="m-md">Logged in as: <%= user.email %> </h5>
           <button class="btn btn-outline-dark m-md" type="submit"> Log Out</button>
         </div>
       </form>
