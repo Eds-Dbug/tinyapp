@@ -14,7 +14,7 @@ const users = {
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: "x",
   },
 };
 
@@ -34,6 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 /********************************************************************************
  * GET ROUTES
  ******************************************************************************/
+
 
 /*****************************
  * / ROUTE (for sending hello world on default page)
@@ -86,6 +87,30 @@ app.get('/urls/:id',(req, res) => {
   };
   res.render('urls_show', templateVars);
 });
+/*****************************
+ * /LOGIN (for rendering urls_show page)
+*****************************/
+app.get('/login',(req,res) => {
+  const user_id = req.cookies.user_id;
+  const templateVars = {
+    urls: urlDatabase,
+    user: users[user_id]
+  };
+  res.render('login',templateVars)
+})
+
+/*****************************
+ * /REGISTER (for rendering urls_show page)
+*****************************/
+app.get('/register',(req,res) => {
+  const user_id = req.cookies.user_id;
+  const templateVars = {
+    urls: urlDatabase,
+    user: users[user_id]
+  };
+  res.render('register',templateVars)
+});
+
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
@@ -94,16 +119,13 @@ app.get('/urls.json', (req, res) => {
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
-/********************************************************************************
- * /RESGISTER ROUTE (for rending register page)
- ******************************************************************************/
-app.get('/register',(req,res) => {
-  res.render('register')
-})
+
+
 
 /********************************************************************************
  * POST ROUTES
  ******************************************************************************/
+
 
 /*****************************
  * /URLS ROUTE (for creating new link)
@@ -150,12 +172,12 @@ app.post('/register',(req,res) => {
     return res.status(400).send("400 : Empty email or password");
   }
   if(findEmail(users,newEmail)) {
-    console.log(users)
+    //console.log(users)
     return res.status(400).send("400 : Email already exists");
   }
-  users[id] = {id, email:newEmail, password}
+    users[id] = {id, email:newEmail, password}
+    res.cookie('user_id',id);
   
-  res.cookie('user_id',id);
   return res.redirect('/urls')
 })
 
@@ -163,15 +185,35 @@ app.post('/register',(req,res) => {
  * /LOGIN ROUTE
 *****************************/
 app.post('/login', (req,res) => {
-  res.cookie('username',req.body.username) 
-  return res.redirect('/urls')
+  //console.log(req.body)
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = findEmail(users,email);
+  //console.log(user.id);
+  //lookup the email adress 
+  //if email adress doesnt exist response 403
+  if(!findEmail(users,email)){
+    return res.status(403).send("403 : Email does not exist");
+  }else{
+    //if email exists than compare passwords with the form pass if no match 403
+    if(findEmail(users,email).password === password){
+      //if the pass words do match set the user_id cookie matching user id than redirect to /urls
+      
+      res.cookie('user_id',String(user.id)) 
+      return res.redirect('/urls')
+    }else {
+      return res.status(403).send("403 : Wrong Password");
+    }
+  }
 })
 
 /*****************************
  * /LOGOUT ROUTE
 *****************************/
  app.post('/logout', (req,res) => {
-  res.clearCookie('username',req.body.username)
+  const email = req.body.email;
+  const user = findEmail(users,email);
+  res.clearCookie('user_id',user.id)
   return res.redirect('/urls');
 })
 

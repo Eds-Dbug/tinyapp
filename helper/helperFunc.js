@@ -11,13 +11,13 @@ function generateRandomString() {
   return result;
 }
 
-function findEmail(users,newEmail) {
+function findEmail(users,email) {
   const keys = Object.keys(users)
   for(let key of keys) {
     //console.log(users[key].email)
-    if(users[key].email === newEmail){
+    if(users[key].email === email){
       //console.log(users)
-      return true
+      return users[key];
     }
     
   }
