@@ -23,17 +23,23 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
 /********************************************************************************
- * App Uses
- ******************************************************************************/
+ *******************************************************************************
+ * APP USES
+ ******************************************************************************
+ *******************************************************************************/
 app.set('view engine', 'ejs');
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }));
 
 
+
 /********************************************************************************
+ *******************************************************************************
  * GET ROUTES
- ******************************************************************************/
+ ******************************************************************************
+ *******************************************************************************/
 
 
 /*****************************
@@ -57,7 +63,10 @@ app.get('/urls',(req, res) => {
  * /U/:ID ROUTE (for redirecting short links to the longURL link)
 *****************************/
 app.get("/u/:id", (req, res) => {
-  const shortURL = req.params.id
+  const shortURL = req.params.id;
+  if(!urlDatabase[shortURL]){
+    return res.send('Erro: id does not exits\n');
+  }
   if(urlDatabase[shortURL]){
     res.redirect(urlDatabase[shortURL]);
   }
@@ -69,6 +78,9 @@ app.get("/u/:id", (req, res) => {
 *****************************/
 app.get('/urls/new',(req, res) => {
   const user_id = req.cookies.user_id;
+  if(!user_id) {
+    return res.redirect('/login')
+  }
   const templateVars = {
     user : users[user_id]
   };
@@ -79,7 +91,7 @@ app.get('/urls/new',(req, res) => {
 *****************************/
 app.get('/urls/:id',(req, res) => {
 //console.log(req.cookies)
-  const user_id = req.cookies.user_id;_
+  const user_id = req.cookies.user_id;
   const templateVars = {
     id: req.params.id, 
     longURL: urlDatabase[req.params.id],
@@ -96,7 +108,10 @@ app.get('/login',(req,res) => {
     urls: urlDatabase,
     user: users[user_id]
   };
-  res.render('login',templateVars)
+  if(user_id){
+    return res.redirect('/urls')
+  }
+  return res.render('login',templateVars)
 })
 
 /*****************************
@@ -108,7 +123,10 @@ app.get('/register',(req,res) => {
     urls: urlDatabase,
     user: users[user_id]
   };
-  res.render('register',templateVars)
+  if(user_id) {
+    return res.redirect('/urls')
+  }
+  return res.render('register',templateVars)
 });
 
 
@@ -123,8 +141,10 @@ app.get('/hello', (req, res) => {
 
 
 /********************************************************************************
+ *******************************************************************************
  * POST ROUTES
- ******************************************************************************/
+ ******************************************************************************
+ *******************************************************************************/
 
 
 /*****************************
@@ -132,8 +152,13 @@ app.get('/hello', (req, res) => {
 *****************************/
 app.post('/urls', (req, res) => {
   //console.log(req.body);
+  const user_id = req.cookies.user_id;
   const longURL = req.body.longURL
   const genId = generateRandomString();
+  if(!user_id) {
+    return res.send('Please login to shorten URL!\n')
+  }
+
   urlDatabase[genId] = longURL;
   res.redirect(`/urls/${genId}`);
 });
