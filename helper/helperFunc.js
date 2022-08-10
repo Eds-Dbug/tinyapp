@@ -11,6 +11,19 @@ function generateRandomString() {
   return result;
 }
 
+function findEmail(users,newEmail) {
+  const keys = Object.keys(users)
+  for(let key of keys) {
+    //console.log(users[key].email)
+    if(users[key].email === newEmail){
+      //console.log(users)
+      return true
+    }
+    
+  }
+
+  return false;
+}
 // function generateRandomString() {
 //   let result = '';
 //   let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -22,4 +35,6 @@ function generateRandomString() {
 
 //const genrateId = generateRandomString();
 
-module.exports = {generateRandomString}
+
+
+module.exports = {generateRandomString,findEmail}

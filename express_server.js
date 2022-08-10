@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const {generateRandomString} = require('./generate_string/generateRandomString')
+const {generateRandomString,findEmail} = require('./helper/helperFunc')
 const app = express();
 const PORT = 8080;
 
@@ -145,16 +145,13 @@ app.post('/register',(req,res) => {
   const newEmail = req.body.email;
   const password = req.body.password
   const id = generateRandomString();
-  const keys = Object.keys(users)
+  
   if(!newEmail || !password) {
     return res.status(400).send("400 : Empty email or password");
   }
-  for(let key of keys) {
-    //console.log(users[key].email)
-    if(users[key].email === newEmail){
-      //console.log(users)
-      return res.status(400).send("400 : Email already exists");
-    }
+  if(findEmail(users,newEmail)) {
+    console.log(users)
+    return res.status(400).send("400 : Email already exists");
   }
   users[id] = {id, email:newEmail, password}
   
