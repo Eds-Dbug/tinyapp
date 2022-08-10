@@ -177,7 +177,7 @@ app.post('/register',(req,res) => {
   }
     users[id] = {id, email:newEmail, password}
     res.cookie('user_id',id);
-  
+    console.log(users)
   return res.redirect('/urls')
 })
 
