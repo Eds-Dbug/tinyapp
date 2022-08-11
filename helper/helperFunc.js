@@ -1,52 +1,38 @@
-function generateRandomString() {
+const generateRandomString = function() {
   let result = '';
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let charLen = characters.length;
   
   //loop up to 6
-  for(let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * 
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() *
  charLen));
   }
   return result;
-}
+};
 
-function findEmail(users,email) {
-  const keys = Object.keys(users)
-  for(let key of keys) {
+const findByEmail = function(users,email) {
+  const keys = Object.keys(users);
+  for (let key of keys) {
     //console.log(users[key].email)
-    if(users[key].email === email){
-      //console.log(users)
-      console.log(users[key])
+    if (users[key].email === email) {
       return users[key];
     }
   }
   return false;
-}
+};
 
-function urlsForUser(urlDatabase,id) {
-  const keys = Object.keys(urlDatabase)
-  let resultURLS = {}
-  for(let key of keys) {
-    if(urlDatabase[key].userID === id) {
-      resultURLS[key] = {longURL: urlDatabase[key].longURL}
+const urlsForUser = function(urlDatabase,id) {
+  const keys = Object.keys(urlDatabase);
+
+  let resultURLS = {};
+  for (let key of keys) {
+    if (urlDatabase[key].userID === id) {
+      resultURLS[key] = {longURL: urlDatabase[key].longURL};
     }
   }
   //console.log(resultURLS)
   return resultURLS;
-}
+};
 
-// function generateRandomString() {
-//   let result = '';
-//   let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-//   for (let i = 6; i > 0; i--) {
-//     result += chars[Math.floor(Math.random() * chars.length)];
-//   }
-//   return result;
-// };
-
-//const genrateId = generateRandomString();
-
-
-
-module.exports = {generateRandomString,findEmail,urlsForUser}
+module.exports = {generateRandomString,findByEmail,urlsForUser};

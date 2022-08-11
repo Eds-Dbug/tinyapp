@@ -33,7 +33,6 @@ describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
     const user = findEmail(testUsers,"user@example.com")
     const expectedUserID = "userRandomID";
-    // Write your assert statement here
     expect(user.id).to.be.equal(expectedUserID)
   });
 
@@ -52,7 +51,6 @@ describe('getUserByEmail', function() {
       email: "user2@example.com", 
       password: "dishwasher-funk"
     };
-    // Write your assert statement here
     expect(user).to.be.deep.equal(expectedUser)
   });
 
