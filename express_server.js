@@ -1,8 +1,10 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const {generateRandomString,findEmail,urlsForUser} = require('./helper/helperFunc')
+const bcrypt = require("bcryptjs");
+const salt = bcrypt.genSaltSync(10)
 const app = express();
 const PORT = 8080;
+const {generateRandomString,findEmail,urlsForUser} = require('./helper/helperFunc')
 
 
 const users = {
@@ -239,6 +241,7 @@ app.post('/urls/:id/delete', (req,res)=> {
 app.post('/register',(req,res) => {
   const newEmail = req.body.email;
   const password = req.body.password
+  const hashedPasswrd = bcrypt.hashSync(password,salt)
   const id = generateRandomString();
   
   if(!newEmail || !password) {
@@ -247,7 +250,7 @@ app.post('/register',(req,res) => {
   if(findEmail(users,newEmail)) {
     return res.status(400).send("400 : Email already exists");
   }
-    users[id] = {id, email: newEmail, password}
+    users[id] = {id, email: newEmail, hashedPasswrd}
     res.cookie('user_id',id);
     res.redirect('/urls');
 })
@@ -259,6 +262,7 @@ app.post('/login', (req,res) => {
   //console.log(req.body)
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPasswrd = bcrypt.hashSync(password,salt)
   const user = findEmail(users,email);
   //lookup the email adress 
   //if email adress doesnt exist response 403
@@ -266,13 +270,13 @@ app.post('/login', (req,res) => {
     return res.status(403).send("403 : Email does not exist");
   }else{
     //if email exists than compare passwords with the form pass if no match 403
-    if(findEmail(users,email).password === password){
+    if(!bcrypt.compareSync(findEmail(users,email).password, hashedPasswrd)){
       //if the pass words do match set the user_id cookie matching user id than redirect to /urls
-      
+      return res.status(403).send("403 : Wrong Password");
+     
+    }else {
       res.cookie('user_id',String(user.id)) 
       return res.redirect('/urls')
-    }else {
-      return res.status(403).send("403 : Wrong Password");
     }
   }
 })
