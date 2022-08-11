@@ -17,6 +17,7 @@ function findEmail(users,email) {
     //console.log(users[key].email)
     if(users[key].email === email){
       //console.log(users)
+      console.log(users[key])
       return users[key];
     }
   }
@@ -31,6 +32,7 @@ function urlsForUser(urlDatabase,id) {
       resultURLS[key] = {longURL: urlDatabase[key].longURL}
     }
   }
+  //console.log(resultURLS)
   return resultURLS;
 }
 
