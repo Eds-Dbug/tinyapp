@@ -6,7 +6,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ![The main page]()
 !["The main page with a link"](#)
-![The page with a cookie once logged in](https://github.com/Eds-Dbug/tinyapp/blob/master/docs/TinyApp_with_cookie.png)
+!["The page with a cookie once logged in"](https://github.com/Eds-Dbug/tinyapp/blob/master/docs/TinyApp_with_cookie.png)
 
 ## Dependencies
 
