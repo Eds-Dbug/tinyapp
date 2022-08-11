@@ -19,11 +19,21 @@ function findEmail(users,email) {
       //console.log(users)
       return users[key];
     }
-    
   }
-
   return false;
 }
+
+function urlsForUser(urlDatabase,id) {
+  const keys = Object.keys(urlDatabase)
+  let resultURLS = {}
+  for(let key of keys) {
+    if(urlDatabase[key].userID === id) {
+      resultURLS[key] = {longURL: urlDatabase[key].longURL}
+    }
+  }
+  return resultURLS;
+}
+
 // function generateRandomString() {
 //   let result = '';
 //   let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -37,4 +47,4 @@ function findEmail(users,email) {
 
 
 
-module.exports = {generateRandomString,findEmail}
+module.exports = {generateRandomString,findEmail,urlsForUser}

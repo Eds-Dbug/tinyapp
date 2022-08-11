@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const {generateRandomString,findEmail} = require('./helper/helperFunc')
+const {generateRandomString,findEmail,urlsForUser} = require('./helper/helperFunc')
 const app = express();
 const PORT = 8080;
 
@@ -9,7 +9,7 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "y",
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -19,9 +19,16 @@ const users = {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "userRandomID",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "user2RandomID",
+  },
 };
+
 
 
 /********************************************************************************
@@ -54,21 +61,29 @@ app.get('/',(req, res) => {
 app.get('/urls',(req, res) => {
   const user_id = req.cookies.user_id;
   const templateVars = {
-    urls: urlDatabase,
-    user: users[user_id]
+    urls: {},
+    user: users[user_id],
+    loggedIn: false,
+    notLoggedInMsg: "Log in to see URLs !"
   };
-  res.render('urls_index', templateVars);
+  if(user_id) {
+    templateVars.loggedIn = true;
+    templateVars.urls = urlsForUser(urlDatabase, user_id)
+  }
+  return res.render('urls_index', templateVars);
 });
 /*****************************
  * /U/:ID ROUTE (for redirecting short links to the longURL link)
 *****************************/
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
+  //if entry exists in database
+
   if(!urlDatabase[shortURL]){
-    return res.send('Erro: id does not exits\n');
+    return res.send('Error: id does not exits\n');
   }
   if(urlDatabase[shortURL]){
-    res.redirect(urlDatabase[shortURL]);
+   return res.redirect(urlDatabase[shortURL].longURL);
   }
   res.status(400).send("No link here");
   
@@ -86,22 +101,29 @@ app.get('/urls/new',(req, res) => {
   };
   res.render('urls_new',templateVars);
 });
+
 /*****************************
  * /URLS/:ID ROUTE (for rendering urls_show page)
 *****************************/
+
 app.get('/urls/:id',(req, res) => {
-//console.log(req.cookies)
   const user_id = req.cookies.user_id;
   const templateVars = {
     id: req.params.id, 
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[user_id]
   };
+  if(!user_id) {
+    return res.status(400).send("Error : Please Login")   
+  }
+
   res.render('urls_show', templateVars);
 });
+
 /*****************************
- * /LOGIN (for rendering urls_show page)
+ * /LOGIN (for users to login)
 *****************************/
+
 app.get('/login',(req,res) => {
   const user_id = req.cookies.user_id;
   const templateVars = {
@@ -117,6 +139,7 @@ app.get('/login',(req,res) => {
 /*****************************
  * /REGISTER (for rendering urls_show page)
 *****************************/
+
 app.get('/register',(req,res) => {
   const user_id = req.cookies.user_id;
   const templateVars = {
@@ -138,28 +161,26 @@ app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
 
-
-
 /********************************************************************************
  *******************************************************************************
  * POST ROUTES
  ******************************************************************************
  *******************************************************************************/
 
-
 /*****************************
  * /URLS ROUTE (for creating new link)
 *****************************/
+
 app.post('/urls', (req, res) => {
   //console.log(req.body);
   const user_id = req.cookies.user_id;
-  const longURL = req.body.longURL
+  const newLongURL = req.body.longURL
   const genId = generateRandomString();
   if(!user_id) {
     return res.send('Please login to shorten URL!\n')
   }
 
-  urlDatabase[genId] = longURL;
+  urlDatabase[genId] = {userID: user_id ,longURL: newLongURL} ;
   res.redirect(`/urls/${genId}`);
 });
 
@@ -167,28 +188,55 @@ app.post('/urls', (req, res) => {
  * /URLS/:ID ROUTE (for updating)
 *****************************/
 app.post('/urls/:id', (req, res) => {
-  console.log(req.body)
+  //console.log(req.body)
   const longURL = req.body.longURL
-  const id = req.params.id;
-  urlDatabase[id] = longURL;
-  res.redirect(`/urls/${id}`);
+  const url_id = req.params.id;
+  const user_id = req.cookies.user_id;
+  const urlsUser = urlsForUser(urlDatabase,user_id)
+  //console.log(req.cookies)
+  if(!user_id) {
+    return res.status(403).send(`Error: is not logged in\n`);
+  }
+  if(!urlDatabase[url_id]){
+    return res.status(404).send(`Error: id:${url_id} does not exist\n`);
+  }
+  if(!urlsUser[url_id]){
+    return res.status(403).send(`Error: User does not own URL ${url_id}\n`);
+  }
 
-})
+  urlDatabase[url_id] = {userID: user_id ,longURL};
+  res.redirect(`/urls/${url_id}`);
+});
 /*****************************
  * /URLS/:ID/DELETE ROUTE
 *****************************/
+
 app.post('/urls/:id/delete', (req,res)=> {
   //console.log(req.params.id)
   //console.log(req.params)
-  delete urlDatabase[req.params.id]
-  return res.redirect('/urls')
+  const user_id = req.cookies.user_id;
+  const urlsUser = urlsForUser(urlDatabase,user_id)
+  const url_id = req.params.id;
+
+  if(!user_id) {
+    return res.status(403).send(`Error: is not logged in\n`);
+  }
+  if(!urlDatabase[url_id]){
+    return res.status(404).send(`Error: id:${url_id} does not exist\n`);
+  }
+  if(!urlsUser[url_id]){
+    return res.status(403).send(`Error: User does not own URL ${url_id}\n`);
+  }
+  
+  delete urlDatabase[url_id]
+  //console.log(urlDatabase)
+  res.redirect('/urls')
 }) 
 
 /*****************************
  * /REGISTER ROUTE
 *****************************/
 app.post('/register',(req,res) => {
-  //console.log(req.body)
   const newEmail = req.body.email;
   const password = req.body.password
   const id = generateRandomString();
@@ -197,13 +245,11 @@ app.post('/register',(req,res) => {
     return res.status(400).send("400 : Empty email or password");
   }
   if(findEmail(users,newEmail)) {
-    //console.log(users)
     return res.status(400).send("400 : Email already exists");
   }
-    users[id] = {id, email:newEmail, password}
+    users[id] = {id, email: newEmail, password}
     res.cookie('user_id',id);
-    console.log(users)
-  return res.redirect('/urls')
+    res.redirect('/urls');
 })
 
 /*****************************
@@ -214,7 +260,6 @@ app.post('/login', (req,res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = findEmail(users,email);
-  //console.log(user.id);
   //lookup the email adress 
   //if email adress doesnt exist response 403
   if(!findEmail(users,email)){

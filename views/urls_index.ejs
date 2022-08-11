@@ -19,6 +19,7 @@
   </header>
   
   <main style="margin: 1em;">
+    <% if(loggedIn) { %>
     <h3>My URLs</h3>
     <table class="table">
       <thead>
@@ -29,28 +30,30 @@
           <th scope="col">Delete</th>
         </tr>
       </thead>
-      
+     
       <tbody>
-        <% for (let id in urls) { %>
+        <% for (let url_id in urls) { %>
           <tr>
-            <td><%= id %></td>
-            <td><%= urls[id] %></td>
+            <td><%= url_id %></td>
+            <td><%= urls[url_id].longURL %></td>
             <td>
-              <a class=" nav-item nav-link" href="/urls/<%=id%>">
+              <a class=" nav-item nav-link" href="/urls/<%=url_id%>">
                 <button class="btn btn-outline-primary">
                   Edit
                 </button>
               </a>
             </td>
-            <td> <form method="POST" action="/urls/<%= id%>/delete"> <button type="submit" class="btn btn-outline-danger">Delete</button> </form></td>
+            <td> <form method="POST" action="/urls/<%= url_id%>/delete"> <button type="submit" class="btn btn-outline-danger">Delete</button> </form></td>
           </tr>  
         <% } %>
-       
+      
       </tbody>
-   
-   
+      
     </table>
-  </form>
+    <% } else {%>
+      <%= notLoggedInMsg %>
+    <% }%>
+  
   </main>
   <!-- Bootstrap JS -->
   <script
