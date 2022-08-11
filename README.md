@@ -4,6 +4,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 - The main page
+
 !["The main page"](https://github.com/Eds-Dbug/tinyapp/blob/master/docs/main.png)
 
 - The main page with a link
@@ -11,6 +12,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 !["The main page with a link"](https://github.com/Eds-Dbug/tinyapp/blob/master/docs/main_link.png)
 
 - The main page with a cookie
+
 !["The page with a cookie once logged in"](https://github.com/Eds-Dbug/tinyapp/blob/master/docs/TinyApp_with_cookie.png)
 
 ## Dependencies
